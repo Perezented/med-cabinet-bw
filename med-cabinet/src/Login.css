@@ -21,3 +21,8 @@
     width: 20%;
     padding: 1%;
   }
+
+  button{
+    cursor: pointer;
+    border-radius: 3px;
+  }

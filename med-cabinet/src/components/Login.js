@@ -1,17 +1,15 @@
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory } from "react-router-dom"
 import axios from 'axios'
 import * as yup from 'yup';
 
 //set up the form schema
-const formSchema = yup.object().shape({
-    name: yup.string().min(2).required("Please Enter a Name Longer Than 2 Characters."),
-    email: yup.string().required("Please Enter A Valid Email"),
-    password: yup.string().required('Please Enter A Password')
+
+const signSchema = yup.object().shape({
+    name: yup.string().min(2).required('Please Enter a Name Longer Than 2 Characters'),
+    email: yup.string().required('Please Enter A Valid Email'),
+    password: yup.string().min(4).required('Please Enter A Password Of 4 Characters Or More')
 })
-
-
 const Login = () => {
 
     //login state
@@ -38,6 +36,9 @@ const Login = () => {
 
     })
 
+    //button state
+    const [addDisabled, setAddDisabled] = useState(true)
+
     const { push } = useHistory();
 
 
@@ -51,10 +52,10 @@ const Login = () => {
 
         })
 
-        validateChange(event)
+
     }
 
-    const [addDisabled, setAddDisabled] = useState(true)
+    
 
     //handles changes on sign up form
     const handleSignChange = event => {
@@ -65,7 +66,7 @@ const Login = () => {
             [event.target.name]: event.target.value
 
         })
-        validateChange(event)
+        validateSignChange(event)
     }
 
     //handles login request
@@ -75,20 +76,23 @@ const Login = () => {
             .post('https://medcab1.herokuapp.com/api/auth/login', user)
             .then(res => {
                 localStorage.setItem('token', JSON.stringify(res.data.token))
+                push('/home')
+                window.location.reload()
+
                 setUser({
                     name: '',
                     email: '',
                     password: '',
                 }
                 )
-                push('/home')
+
 
             })
             .catch(err => console.log('Login Error:', err))
-            push('/home')
+
 
     }
-
+ 
     //handles sign up request
     const handleSignUp = event => {
         event.preventDefault();
@@ -108,14 +112,20 @@ const Login = () => {
             .catch(err => console.log('Sign Up Error:', err))
     }
 
-    const validateChange = event => {
-        yup.reach(formSchema, event.target.name)
+
+    //actually validates
+    const validateSignChange = event => {
+        yup.reach(signSchema, event.target.name)
             .validate(event.target.type === event.target.value)
             .then(valid => {
+                
                 setError({
+                
                     ...error,
                     [event.target.name]: ""
+                   
                 });
+                console.log(error)
             })
             .catch(err => {
                 console.log(err)
@@ -126,6 +136,15 @@ const Login = () => {
             })
     }
 
+
+    //checks validity
+    useEffect(() => {
+        signSchema.isValid(newUser).then(valid => {
+            setAddDisabled(!valid);
+            console.log(valid)
+        })
+        
+    }, [newUser]);
 
     return (
         <>
@@ -146,7 +165,8 @@ const Login = () => {
                             onChange={handleChange}
                         />
                         <br />
-                        {error.email.length > 0 ? <p>{error.email}</p> : null}
+
+
                         <label htmlFor='password' name='password' >Password*</label>
                         <br />
                         <input
@@ -156,13 +176,14 @@ const Login = () => {
                             onChange={handleChange}
                         />
                         <br />
-                        {error.password.length > 0 ? <p>{error.password}</p> : null}
+
+
                         <button>Login</button>
 
                     </form>
                 </div>
                 <div className='sign'>
-                    <h2>Not a Member? <br/> Sign Up Today!</h2>
+                    <h2>Not a Member? <br /> Sign Up Today!</h2>
                     <form onSubmit={handleSignUp}>
                         <label htmlFor='name' name='name' >Name*</label>
 
@@ -188,6 +209,8 @@ const Login = () => {
                         />
                         <br />
 
+                        {error.email.length > 0 ? <p>{error.email}</p> : null}
+
                         <label htmlFor='password' name='password' >Password*</label>
                         <br />
 
@@ -198,7 +221,10 @@ const Login = () => {
                             onChange={handleSignChange}
                         />
                         <br />
-                        <button onClick={() => { push('/') }}>Submit</button>
+
+                        {error.password.length > 0 ? <p>{error.password}</p> : null}
+
+                        <button onClick={() => { push('/') }} disabled={addDisabled}>Submit</button>
                     </form>
                 </div>
             </div>

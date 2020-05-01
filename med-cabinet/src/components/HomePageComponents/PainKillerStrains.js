@@ -10,14 +10,14 @@ import {
 } from './Settings';
 import Slider from 'infinite-react-carousel';
 
-const SleepyStrains = (props) => {
+const PainKillerStrains = (props) => {
     useEffect(() => {
         props.getStrainsDataFromActions();
     }, []);
 
     return (
         <CardSection>
-            <h2>Strains To Help You Get A Nights Rest</h2>
+            <h2>Strains That Will Ease The Pain</h2>
             <section>
                 {props.isFetching && (
                     <Loader
@@ -27,13 +27,16 @@ const SleepyStrains = (props) => {
                         width={80}
                     />
                 )}
+
                 {/* <Slider {...settings}> */}
                 {props.strains.map((value) => {
                     if (value.medical !== null) {
                         if (value.negative !== null) {
                             if (
-                                value.medical.includes('Insomnia') &&
-                                value.rating === 4.8
+                                value.medical.includes('Pain') &&
+                                value.medical.includes('Fatigue') &&
+                                value.medical.includes('Headaches') &&
+                                value.description !== null
                             ) {
                                 return (
                                     <CardDiv key={value.id}>
@@ -67,5 +70,5 @@ const mapStateToProps = (state) => {
     };
 };
 export default connect(mapStateToProps, { getStrainsDataFromActions })(
-    SleepyStrains
+    PainKillerStrains
 );

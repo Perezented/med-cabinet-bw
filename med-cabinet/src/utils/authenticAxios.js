@@ -4,6 +4,6 @@ export const authenticAxios = () => {
     const token = JSON.parse(localStorage.getItem('token'));
     return axios.create({
         headers: { Authorization: token },
-        baseURL: 'http://localhost:5000', // UPDATE ME WITH THE SERVER INFO////////////////
+        baseURL: 'https://medcabinet-strain-api.herokuapp.com', // UPDATE ME WITH THE SERVER INFO////////////////
     });
 };
